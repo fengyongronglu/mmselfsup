@@ -39,5 +39,5 @@ class ContrastiveHead(BaseModule):
         logits /= self.temperature
         labels = torch.zeros((N, ), dtype=torch.long).to(pos.device)
         losses = dict()
-        losses['loss'] = self.criterion(logits, labels)
+        losses['loss'] = self.criterion(logits, labels) # 注意这个labels是gt索引，只有第一个元素是正例，剩下的都是负例
         return losses

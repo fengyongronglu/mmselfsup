@@ -53,7 +53,7 @@ class MultiViewDataset(BaseDataset):
 
     def __getitem__(self, idx):
         img = self.data_source.get_img(idx)
-        multi_views = list(map(lambda trans: trans(img), self.trans))
+        multi_views = list(map(lambda trans: trans(img), self.trans)) # 两份trans，生成两份数据，分别作为anchor和positive
         if self.prefetch:
             multi_views = [
                 torch.from_numpy(to_numpy(img)) for img in multi_views

@@ -116,7 +116,7 @@ class MAEPretrainDecoder(BaseModule):
         x_ = torch.gather(
             x_,
             dim=1,
-            index=ids_restore.unsqueeze(-1).repeat(1, 1, x.shape[2]))
+            index=ids_restore.unsqueeze(-1).repeat(1, 1, x.shape[2])) # 把mask token插回隐向量中
         x = torch.cat([x[:, :1, :], x_], dim=1)
 
         # add pos embed

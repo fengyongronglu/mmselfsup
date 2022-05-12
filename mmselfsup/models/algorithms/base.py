@@ -7,7 +7,7 @@ import torch.distributed as dist
 from mmcv.runner import BaseModule, auto_fp16
 
 
-class BaseModel(BaseModule, metaclass=ABCMeta):
+class BaseModel(BaseModule, metaclass=ABCMeta): # 这玩意就相当于mmdetection里头的BaseDetector
     """Base model class for self-supervised learning."""
 
     def __init__(self, init_cfg=None):
