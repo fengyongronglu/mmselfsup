@@ -39,7 +39,7 @@ class MoCoV3Head(BaseModule):
             dict[str, Tensor]: A dictionary of loss components.
         """
         # predictor computation
-        pred = self.predictor([base_out])[0]
+        pred = self.predictor([base_out])[0] # Query 编码器额外增加 Prediction Head
 
         # normalize
         pred = nn.functional.normalize(pred, dim=1)
@@ -48,7 +48,7 @@ class MoCoV3Head(BaseModule):
         # get negative samples
         target = concat_all_gather(target)
 
-        # Einstein sum is more intuitive
+        # Einstein sum is more intuitive # 这里应该跟v1的那个 'nc,ck->nk' 差求不多，算出来的就是n中的某个样本和m里的某个样本二者之间的logit
         logits = torch.einsum('nc,mc->nm', [pred, target]) / self.temperature
 
         # generate labels
@@ -56,5 +56,5 @@ class MoCoV3Head(BaseModule):
         labels = (torch.arange(batch_size, dtype=torch.long) +
                   batch_size * torch.distributed.get_rank()).cuda()
 
-        loss = 2 * self.temperature * nn.CrossEntropyLoss()(logits, labels)
+        loss = 2 * self.temperature * nn.CrossEntropyLoss()(logits, labels) # 这个地方骚啊，比v1那个写法还骚，其实就是nm矩阵的对角线元素是gt，其它的不是
         return dict(loss=loss)

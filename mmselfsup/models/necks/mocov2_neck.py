@@ -30,7 +30,7 @@ class MoCoV2Neck(BaseModule):
         if with_avg_pool:
             self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.mlp = nn.Sequential(
-            nn.Linear(in_channels, hid_channels), nn.ReLU(inplace=True),
+            nn.Linear(in_channels, hid_channels), nn.ReLU(inplace=True), # moco v2和moco v1的区别：1. 更多的增广 2. 更多的epoch 3. 投影头这里加了一个隐层
             nn.Linear(hid_channels, out_channels))
 
     def forward(self, x):

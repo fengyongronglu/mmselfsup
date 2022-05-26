@@ -78,12 +78,12 @@ class SimCLR(BaseModel):
         z = torch.cat(GatherLayer.apply(z), dim=0)  # (2N)xd
         assert z.size(0) % 2 == 0
         N = z.size(0) // 2
-        s = torch.matmul(z, z.permute(1, 0))  # (2N)x(2N)
+        s = torch.matmul(z, z.permute(1, 0))  # (2N)x(2N) 这里应该跟moco类似，两两算logit
         mask, pos_ind, neg_mask = self._create_buffer(N)
-        # remove diagonal, (2N)x(2N-1)
-        s = torch.masked_select(s, mask == 1).reshape(s.size(0), -1)
-        positive = s[pos_ind].unsqueeze(1)  # (2N)x1
+        # remove diagonal, (2N)x(2N-1) 移除对角线元素（即自己和自己算的logit）
+        s = torch.masked_select(s, mask == 1).reshape(s.size(0), -1) 
+        positive = s[pos_ind].unsqueeze(1)  # (2N)x1 # 根据上边算的这个pos_ind筛选出正样本
         # select negative, (2N)x(2N-2)
-        negative = torch.masked_select(s, neg_mask == 1).reshape(s.size(0), -1)
-        losses = self.head(positive, negative)
+        negative = torch.masked_select(s, neg_mask == 1).reshape(s.size(0), -1) # 根据上边算的这个neg_mask筛选出负样本
+        losses = self.head(positive, negative) # 对比损失，跟moco v1一样
         return losses

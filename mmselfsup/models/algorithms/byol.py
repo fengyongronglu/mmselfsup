@@ -87,11 +87,11 @@ class BYOL(BaseModel):
         img_v1 = img[0]
         img_v2 = img[1]
         # compute online features
-        proj_online_v1 = self.online_net(img_v1)[0]
+        proj_online_v1 = self.online_net(img_v1)[0] # query编码器
         proj_online_v2 = self.online_net(img_v2)[0]
         # compute target features
         with torch.no_grad():
-            proj_target_v1 = self.target_net(img_v1)[0]
+            proj_target_v1 = self.target_net(img_v1)[0] # 动量编码器
             proj_target_v2 = self.target_net(img_v2)[0]
 
         losses = 2. * (

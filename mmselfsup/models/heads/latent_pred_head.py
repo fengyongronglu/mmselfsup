@@ -32,12 +32,12 @@ class LatentPredictHead(BaseModule):
         Returns:
             dict[str, Tensor]: A dictionary of loss components.
         """
-        pred = self.predictor([input])[0]
-        target = target.detach()
+        pred = self.predictor([input])[0] # 这个设计真蹩脚，把predictor放到损失函数里
+        target = target.detach() # 另一视角断开梯度，特征输出作为gt
 
         pred_norm = nn.functional.normalize(pred, dim=1)
         target_norm = nn.functional.normalize(target, dim=1)
-        loss = -(pred_norm * target_norm).sum(dim=1).mean()
+        loss = -(pred_norm * target_norm).sum(dim=1).mean() # 其实就是mse
         return dict(loss=loss)
 
 

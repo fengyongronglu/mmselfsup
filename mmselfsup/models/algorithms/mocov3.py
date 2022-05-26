@@ -76,7 +76,7 @@ class MoCoV3(BaseModel):
         x = self.backbone(img)
         return x
 
-    def forward_train(self, img, **kwargs):
+    def forward_train(self, img, **kwargs): # 这个v3整的就不如v1简洁了，v1所有的东西都是在一个函数里完成的，这个v3还分成了forward_train和loss
         """Forward computation during training.
 
         Args:
@@ -91,7 +91,7 @@ class MoCoV3(BaseModel):
         view_2 = img[1].cuda(non_blocking=True)
 
         # compute query features, [N, C] each
-        q1 = self.base_encoder(view_1)[0]
+        q1 = self.base_encoder(view_1)[0] # 注意这里体现出了v1和v3的一个差异，v1的两组样本一组是q只送入q编码器，一组是k只送入k编码器（动量编码器），v3不区分样本的qk！q编码器和k编码器都接收这两组输入！
         q2 = self.base_encoder(view_2)[0]
 
         # compute key features, [N, C] each, no gradient
@@ -102,5 +102,5 @@ class MoCoV3(BaseModel):
             k1 = self.momentum_encoder(view_1)[0]
             k2 = self.momentum_encoder(view_2)[0]
 
-        losses = self.head(q1, k2)['loss'] + self.head(q2, k1)['loss']
+        losses = self.head(q1, k2)['loss'] + self.head(q2, k1)['loss'] # q和k的输出是交叉着用的，也就是李沐说的『预测不同的视角』，这么一来区不区分qk也就无所谓了
         return dict(loss=losses)
